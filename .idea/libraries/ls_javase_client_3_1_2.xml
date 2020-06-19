@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="ls-javase-client:3.1.2">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/ls-javase-client/3.1.2" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/ls-javase-client/3.1.2" recursive="false" />
+  </library>
+</component>

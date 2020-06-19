@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="ls-log-adapter-java:1.0.1">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/ls-log-adapter-java/1.0.1" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/ls-log-adapter-java/1.0.1" recursive="false" />
+  </library>
+</component>
