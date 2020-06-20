@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import okhttp3.*;
 import org.json.simple.JSONObject;
 import luca.ig_trading.streamer.data.LoginResponse;
+import org.pmw.tinylog.Logger;
 
 import java.io.IOException;
 
@@ -39,20 +40,23 @@ public class HTTPClient {
 
         try (Response response = httpClient.newCall(request).execute()) {
 
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+            if (!response.isSuccessful()) {
+                Logger.error("login error, code: " + response);
+                throw new IOException("Unexpected code " + response);
+            }
 
             // Get response body
             String responseBodyString = response.body().string();
-            System.out.println(responseBodyString);
+            Logger.info("\n" + responseBodyString);
 
             Gson gson = new Gson();
             LoginResponse loginResponse = gson.fromJson(responseBodyString, LoginResponse.class);
 
             loginResponse.setHeaders(response.headers());
 
-            System.out.println(" - endpoint: " + loginResponse.getLightstreamerEndpoint());
+            Logger.info(" - endpoint: " + loginResponse.getLightstreamerEndpoint());
 
-            System.out.println(" - headers: ->\n" + loginResponse.getHeaders().toString());
+            Logger.info(" - headers: ->\n" + loginResponse.getHeaders().toString());
 
             return loginResponse;
 

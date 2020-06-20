@@ -17,6 +17,7 @@ package luca.ig_trading.streamer;
 
 import com.lightstreamer.client.ClientListener;
 import com.lightstreamer.client.LightstreamerClient;
+import org.pmw.tinylog.Logger;
 
 public class LogClientListener implements com.lightstreamer.client.ClientListener {
 
@@ -25,28 +26,27 @@ public class LogClientListener implements com.lightstreamer.client.ClientListene
 
     @Override
     public void onListenEnd(LightstreamerClient client) {
-      System.out.println("Stops listening to client events");
+      Logger.info("Stops listening to client: " + client.connectionDetails.toString());
     }
 
     @Override
     public void onListenStart(LightstreamerClient client) {
-      System.out.println("Start listening to client events");
-      
+      Logger.info("Start listening to client: " + client.connectionDetails.toString() );
     }
 
     @Override
     public void onPropertyChange(String property) {
-      System.out.println("Client property changed: " + property);
+      Logger.info("Client property changed: " + property);
     }
 
     @Override
     public void onServerError(int code, String message) {
-      System.out.println("Server error: " + code + ": " + message);
+      Logger.info("Server error: " + code + ": " + message);
     }
 
     @Override
     public void onStatusChange(String newStatus) {
-      System.out.println("Connection status changed to " + newStatus);
+      Logger.info("Connection status changed to " + newStatus);
     }
 
   

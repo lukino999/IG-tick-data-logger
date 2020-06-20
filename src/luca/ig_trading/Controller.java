@@ -20,7 +20,7 @@ public class Controller {
     private MenuItem connect;
     private MyLogger logFileWriter;
     private LoginDetails loginDetails;
-    private Streamer streamer;
+    private Streamer streamer = new Streamer();
 
     public void setBaseFileName(String baseFileName) {
         logFileWriter = new MyLogger(baseFileName);
@@ -33,6 +33,7 @@ public class Controller {
         logFileWriter.addMessageListener(renderedLogEntry -> {
             Platform.runLater(() -> consoleTextArea.appendText(renderedLogEntry));
         });
+        streamer.setBaseFileName(baseFileName);
     }
 
 
@@ -43,17 +44,20 @@ public class Controller {
 
     public void onMenuConnectConnect(ActionEvent actionEvent) {
         Logger.info("connect");
-        Runnable startStreaming = new Runnable() {
+        startStreaming();
+        connect.setDisable(true);
+    }
+
+    private void startStreaming() {
+        Runnable stream = new Runnable() {
             @Override
             public void run() {
-                streamer = new Streamer();
                 streamer.setLoginDetails(loginDetails);
                 streamer.startLiveStream();
             }
         };
 
-        startStreaming.run();
-        connect.setDisable(true);
+        stream.run();
     }
 
 

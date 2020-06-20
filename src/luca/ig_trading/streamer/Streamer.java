@@ -4,6 +4,7 @@ import com.lightstreamer.client.LightstreamerClient;
 import com.lightstreamer.client.Subscription;
 import luca.ig_trading.streamer.data.LoginDetails;
 import luca.ig_trading.streamer.data.LoginResponse;
+import org.pmw.tinylog.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class Streamer {
             System.out.println("args required: username password apiKey");
             return;
         }
+
         loginDetails.setUsername(args[0]);
         loginDetails.setPassword(args[1]);
         loginDetails.setApiKey(args[2]);
@@ -58,33 +60,23 @@ public class Streamer {
 
     public void startLiveStream() {
 
-        System.out.println(" - Logging in");
+        Logger.info(" - Logging in");
 
         httpClient = new HTTPClient();
 
         LoginResponse loginResponse = login();
 
-        System.out.println(" login response = " + loginResponse.toString());
-        // check for successful login
         if (loginResponse == null) {
             return;
         } else {
 
-            /*
-            try {
-                System.out.println("Streamer: opening file");
-                fileWriter = new FileWriter("./data/" + fileName + ".csv");
-            } catch (IOException e) {
-                System.out.println("Streamer: ERROR OPENING FILE");
-                e.printStackTrace();
-            }
-             */
+            // open file and schedule flush in between every second
 
             //
             String serverAddress = loginResponse.getLightstreamerEndpoint();
 
             lsClient = new LightstreamerClient(serverAddress, null);
-            System.out.println(" - current account id: " + loginResponse.getCurrentAccountId());
+            Logger.info(" - current account id: " + loginResponse.getCurrentAccountId());
             lsClient.connectionDetails.setUser(loginResponse.getCurrentAccountId());
 
             String password = "";
@@ -124,7 +116,7 @@ public class Streamer {
     }
 
     public void stopLiveStream() {
-        System.out.println(" stopLiveStream");
+        Logger.info(" stopLiveStream");
         if (lsClient != null) {
             lsClient.unsubscribe(subscription);
             lsClient.disconnect();
@@ -152,5 +144,9 @@ public class Streamer {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setBaseFileName(String baseFileName) {
+        this.fileName = baseFileName + ".csv";
     }
 }

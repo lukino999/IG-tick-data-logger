@@ -4,6 +4,7 @@ package luca.ig_trading.streamer;
 import com.lightstreamer.client.ItemUpdate;
 import com.lightstreamer.client.Subscription;
 import com.lightstreamer.client.SubscriptionListener;
+import org.pmw.tinylog.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,31 +21,31 @@ class LogSubscriptionListener implements SubscriptionListener {
     public void onClearSnapshot(String itemName, int itemPos) {
         String msg = "onClearSnapshot: ";
         msg += "itemName: " + itemName + " - itemPos: " + String.valueOf(itemPos);
-        System.out.println(msg);
+        Logger.info(msg);
     }
 
     @Override
     public void onCommandSecondLevelItemLostUpdates(int lostUpdates, String key) {
         String msg = "onCommandSecondLevelItemLostUpdates: ";
         msg += "lostUpdates: " + String.valueOf(lostUpdates) + " - key: " + key;
-        System.out.println(msg);
+        Logger.info(msg);
     }
 
     @Override
     public void onCommandSecondLevelSubscriptionError(int code, String message, String key) {
         String msg = "onCommandSecondLevelSubscriptionError: ";
         msg += "code: " + String.valueOf(code) + " - message: " + message + " - key: " + key;
-        System.out.println(msg);
+        Logger.info(msg);
     }
 
     @Override
     public void onEndOfSnapshot(String arg0, int arg1) {
-        System.out.println("Snapshot is now fully received, from now on only real-time messages will be received");
+        Logger.info("Snapshot is now fully received, from now on only real-time messages will be received");
     }
 
     @Override
     public void onItemLostUpdates(String itemName, int itemPos, int lostUpdates) {
-        System.out.println(lostUpdates + " messages were lost");
+        Logger.info(lostUpdates + " messages were lost");
     }
 
     @Override
@@ -72,28 +73,28 @@ class LogSubscriptionListener implements SubscriptionListener {
 
     @Override
     public void onListenEnd(Subscription subscription) {
-        System.out.println("Stop listening to subscription: " + subscription.toString());
+        Logger.info("Stop listening to subscription: " + subscription.toString());
     }
 
     @Override
     public void onListenStart(Subscription subscription) {
-        System.out.println("Start listening to subscription: " + subscription.toString());
+        Logger.info("Start listening to subscription: " + subscription.toString());
 
     }
 
     @Override
     public void onSubscription() {
-        System.out.println("Now subscribed to the chat item, messages will now start coming in");
+        Logger.info("Now subscribed to the chat item, messages will now start coming in");
     }
 
     @Override
     public void onSubscriptionError(int code, String message) {
-        System.out.println("Cannot subscribe because of error " + code + ": " + message);
+        Logger.info("Cannot subscribe because of error " + code + ": " + message);
     }
 
     @Override
     public void onUnsubscription() {
-        System.out.println("Now unsubscribed from chat item, no more messages will be received");
+        Logger.info("Now unsubscribed from chat item, no more messages will be received");
     }
 
 }
