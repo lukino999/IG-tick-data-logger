@@ -2,21 +2,25 @@ package luca.ig_trading;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import luca.ig_trading.Logger.MyLogger;
+import luca.ig_trading.streamer.Streamer;
+import luca.ig_trading.streamer.data.LoginDetails;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
 
 
 public class Controller {
 
+    @FXML
+    private TextArea consoleTextArea;
+    @FXML
+    private MenuItem connect;
     private MyLogger logFileWriter;
-    public TextArea consoleTextArea;
-
-
-    public void onMenuConnectConnect(ActionEvent actionEvent) {
-        Logger.info("onMenuConnectConnect");
-    }
+    private LoginDetails loginDetails;
+    private Streamer streamer;
 
     public void setBaseFileName(String baseFileName) {
         logFileWriter = new MyLogger(baseFileName);
@@ -31,8 +35,34 @@ public class Controller {
         });
     }
 
+
+    public void setLoginDetails(LoginDetails loginDetails) {
+        this.loginDetails = loginDetails;
+    }
+
+
+    public void onMenuConnectConnect(ActionEvent actionEvent) {
+        Logger.info("connect");
+        Runnable startStreaming = new Runnable() {
+            @Override
+            public void run() {
+                streamer = new Streamer();
+                streamer.setLoginDetails(loginDetails);
+                streamer.startLiveStream();
+            }
+        };
+
+        startStreaming.run();
+        connect.setDisable(true);
+    }
+
+
     public void close() {
         try {
+            if(streamer != null) {
+                streamer.stopLiveStream();
+            }
+            Thread.sleep(500);
             logFileWriter.close();
         } catch (Exception e) {
             e.printStackTrace();

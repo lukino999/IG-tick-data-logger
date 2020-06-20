@@ -9,7 +9,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Connect">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#onMenuConnectConnect" text="Connect" />
+              <MenuItem fx:id="connect" mnemonicParsing="false" onAction="#onMenuConnectConnect" text="Connect" />
             </items>
           </Menu>
         </menus>

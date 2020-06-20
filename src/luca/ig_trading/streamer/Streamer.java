@@ -2,6 +2,7 @@ package luca.ig_trading.streamer;
 
 import com.lightstreamer.client.LightstreamerClient;
 import com.lightstreamer.client.Subscription;
+import luca.ig_trading.streamer.data.LoginDetails;
 import luca.ig_trading.streamer.data.LoginResponse;
 
 import java.io.FileWriter;
@@ -36,33 +37,31 @@ public class Streamer {
     private HTTPClient httpClient;
     private FileWriter fileWriter;
     private String fileName;
-    private static String username;
-    private static String password;
-    private static String apiKey;
+    private static LoginDetails loginDetails;
 
     public static void main(String[] args) {
         if (args.length != 3) {
             System.out.println("args required: username password apiKey");
             return;
         }
-        username = args[0];
-        password = args[1];
-        apiKey = args[2];
+        loginDetails.setUsername(args[0]);
+        loginDetails.setPassword(args[1]);
+        loginDetails.setApiKey(args[2]);
 
         Streamer streamer = new Streamer();
         streamer.startLiveStream();
     }
 
-    // constructor
-    public Streamer() {
-        httpClient = new HTTPClient();
+    public static void setLoginDetails(LoginDetails loginDetails) {
+        Streamer.loginDetails = loginDetails;
     }
 
     public void startLiveStream() {
 
         System.out.println(" - Logging in");
 
-        // login
+        httpClient = new HTTPClient();
+
         LoginResponse loginResponse = login();
 
         System.out.println(" login response = " + loginResponse.toString());
@@ -144,7 +143,11 @@ public class Streamer {
     //
     private LoginResponse login() {
         try {
-            return httpClient.login(username, password, apiKey);
+            return httpClient.login(
+                    loginDetails.getUsername(),
+                    loginDetails.getPassword(),
+                    loginDetails.getApiKey()
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
