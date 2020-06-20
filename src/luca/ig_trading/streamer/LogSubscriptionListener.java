@@ -6,15 +6,15 @@ import com.lightstreamer.client.Subscription;
 import com.lightstreamer.client.SubscriptionListener;
 import org.pmw.tinylog.Logger;
 
-import java.io.FileWriter;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 
 class LogSubscriptionListener implements SubscriptionListener {
 
-    FileWriter fileWriter;
+    private BufferedOutputStream stream;
 
-
-    public LogSubscriptionListener() {
+    public LogSubscriptionListener(BufferedOutputStream stream) {
+        this.stream = stream;
     }
 
     @Override
@@ -53,22 +53,26 @@ class LogSubscriptionListener implements SubscriptionListener {
         String itemName = update.getItemName();
 
         System.out.println("onItemUpdate: " + itemName);
-        /*
+
         String bidString = update.getValue("BID");
         String ofrString = update.getValue("OFR");
         String utmString = update.getValue("UTM");
 
         String record = itemName + "," + bidString + "," + ofrString + "," + utmString + "\n";
-        try {
-            System.out.println("onItemUpdate: adding record to file");
-            fileWriter.write(record);
-            fileWriter.flush();
-        } catch (IOException e) {
-            System.out.println("Error adding record to file");
-            e.printStackTrace();
-        }
 
-         */
+        writeToFile(record);
+
+    }
+
+    private void writeToFile(String record) {
+        byte[] data = record.getBytes();
+        synchronized (stream) {
+            try {
+                stream.write(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

@@ -2,18 +2,22 @@ package luca.ig_trading.streamer;
 
 import com.lightstreamer.client.LightstreamerClient;
 import com.lightstreamer.client.Subscription;
+import luca.ig_trading.Logger.Delay;
 import luca.ig_trading.streamer.data.LoginDetails;
 import luca.ig_trading.streamer.data.LoginResponse;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.Logger;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Streamer {
 
     private static final String[] fields = {"BID", "OFR", "UTM"};
-
+    private static final ArrayList<String> items = new ArrayList<>();
     private static String[] epics = {
             "CS.D.GBPUSD.TODAY.IP",
             "CS.D.EURGBP.TODAY.IP",
@@ -31,14 +35,14 @@ public class Streamer {
             "CS.D.XRPUSD.TODAY.IP",
             "CS.D.LTCUSD.TODAY.IP"
     };
-    private static final ArrayList<String> items = new ArrayList<>();
-
+    private static LoginDetails loginDetails;
     private LightstreamerClient lsClient;
     private Subscription subscription;
     private HTTPClient httpClient;
-    private FileWriter fileWriter;
-    private String fileName;
-    private static LoginDetails loginDetails;
+    private String baseFileName;
+    private Timer timer;
+    private BufferedOutputStream stream;
+    private final int BUFFER_SIZE = 1024;
 
     public static void main(String[] args) {
         if (args.length != 3) {
@@ -54,9 +58,16 @@ public class Streamer {
         streamer.startLiveStream();
     }
 
+
     public static void setLoginDetails(LoginDetails loginDetails) {
         Streamer.loginDetails = loginDetails;
     }
+
+
+    public void setBaseFileName(String baseFileName) {
+        this.baseFileName = baseFileName;
+    }
+
 
     public void startLiveStream() {
 
@@ -71,18 +82,17 @@ public class Streamer {
         } else {
 
             // open file and schedule flush in between every second
+            openFileStream();
 
             //
             String serverAddress = loginResponse.getLightstreamerEndpoint();
-
             lsClient = new LightstreamerClient(serverAddress, null);
-            Logger.info(" - current account id: " + loginResponse.getCurrentAccountId());
+
             lsClient.connectionDetails.setUser(loginResponse.getCurrentAccountId());
 
             String password = "";
             String client_token = loginResponse.getHeaders().get("CST");
             String account_token = loginResponse.getHeaders().get("X-SECURITY-TOKEN");
-
             if (client_token != null) {
                 password = "CST-" + client_token;
             }
@@ -94,26 +104,60 @@ public class Streamer {
             }
             lsClient.connectionDetails.setPassword(password);
 
-            com.lightstreamer.client.ClientListener clientListener = new LogClientListener();
-            lsClient.addListener(clientListener);
+            lsClient.addListener(new LogClientListener());
 
             for (String epic : epics) {
                 items.add("CHART:" + epic + ":TICK");
             }
-
             String[] itemsArray = new String[items.size()];
             itemsArray = items.toArray(itemsArray);
 
             subscription = new Subscription("DISTINCT", itemsArray, fields);
             subscription.setRequestedSnapshot("yes");
 
-            com.lightstreamer.client.SubscriptionListener subListener = new LogSubscriptionListener();
+            com.lightstreamer.client.SubscriptionListener subListener = new LogSubscriptionListener(stream);
             subscription.addListener(subListener);
 
             lsClient.subscribe(subscription);
             lsClient.connect();
         }
     }
+
+    private void openFileStream() {
+        File file = new File(baseFileName + ".csv");
+        EnvironmentHelper.makeDirectories(file);
+
+        try {
+            stream = new BufferedOutputStream(new FileOutputStream(file, false), BUFFER_SIZE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        scheduleFileFlush();
+    }
+
+    private void scheduleFileFlush() {
+        TimerTask flushFile = new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("csv flush: " + LocalDateTime.now());
+                try {
+                    synchronized (stream) {
+                        stream.flush();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error with scheduled file flush");
+                    e.printStackTrace();
+                }
+            }
+        };
+        timer = new Timer();
+        LocalDateTime now = LocalDateTime.now();
+
+        //
+        timer.scheduleAtFixedRate(flushFile, Delay.getDelayToNextSecond() + 500, 1000);
+    }
+
 
     public void stopLiveStream() {
         Logger.info(" stopLiveStream");
@@ -122,12 +166,16 @@ public class Streamer {
             lsClient.disconnect();
         }
 
-        if (fileWriter != null) {
+        if (stream != null) {
             try {
-                fileWriter.close();
+                stream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        if(timer != null) {
+            timer.cancel();
         }
     }
 
@@ -146,7 +194,4 @@ public class Streamer {
         return null;
     }
 
-    public void setBaseFileName(String baseFileName) {
-        this.fileName = baseFileName + ".csv";
-    }
 }
