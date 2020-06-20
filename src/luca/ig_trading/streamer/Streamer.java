@@ -17,7 +17,17 @@ public class Streamer {
             "CS.D.EURGBP.TODAY.IP",
             "CS.D.EURUSD.TODAY.IP",
             "CS.D.USDJPY.TODAY.IP",
-            "IX.D.FTSE.DAILY.IP"
+            "IX.D.FTSE.DAILY.IP",
+            "CS.D.BITCOIN.TODAY.IP",
+            "CS.D.ETHUSD.TODAY.IP",
+            "CS.D.CRYPTOB10.TODAY.IP",
+            "CS.D.EOSUSD.TODAY.IP",
+            "CS.D.NEOUSD.TODAY.IP",
+            "CS.D.BCHXBT.TODAY.IP",
+            "CS.D.ETHXBT.TODAY.IP",
+            "CS.D.BCHUSD.TODAY.IP",
+            "CS.D.XRPUSD.TODAY.IP",
+            "CS.D.LTCUSD.TODAY.IP"
     };
     private static final ArrayList<String> items = new ArrayList<>();
 
