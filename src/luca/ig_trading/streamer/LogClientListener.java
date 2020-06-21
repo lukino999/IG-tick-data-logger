@@ -46,7 +46,6 @@ public class LogClientListener implements com.lightstreamer.client.ClientListene
     public void onServerError(int code, String message) {
       Logger.info("Server error: " + code + ": " + message);
       clientErrorListener.onError(code);
-
     }
 
     @Override

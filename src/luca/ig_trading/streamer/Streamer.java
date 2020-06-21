@@ -56,6 +56,7 @@ public class Streamer {
         this.clientErrorListener = code -> {
             if (code == 1) {
                 // User/password check failed
+                Logger.info("Attempting to restart live stream");
                 startLiveStream();
             }
         };
@@ -106,8 +107,9 @@ public class Streamer {
             return;
         } else {
 
-            // open file and schedule flush in between every second
-            openFileStream();
+            if(stream == null) {
+                openFileStream();
+            }
 
             //
             String serverAddress = loginResponse.getLightstreamerEndpoint();
@@ -163,10 +165,6 @@ public class Streamer {
 
 
     private void openFileStream() {
-
-        if(stream != null) {
-            return;
-        }
 
         File file = new File(baseFileName + ".csv");
         EnvironmentHelper.makeDirectories(file);
