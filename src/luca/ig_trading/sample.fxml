@@ -6,21 +6,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="luca.ig_trading.Controller">
-   <children>
-      <TextArea fx:id="consoleTextArea" editable="false" layoutX="300.0" layoutY="1.0" prefHeight="498.0" prefWidth="599.0">
-         <font>
-            <Font size="9.0" />
-         </font></TextArea>
-      <MenuBar layoutX="1.0" layoutY="1.0" prefWidth="298.0">
-        <menus>
-          <Menu mnemonicParsing="false" text="Connect">
-            <items>
-              <MenuItem fx:id="connect" mnemonicParsing="false" onAction="#onMenuConnectConnect" text="Connect" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-      <TextArea fx:id="tickerListTextArea" editable="false" layoutX="1.0" layoutY="31.0" prefHeight="468.0" prefWidth="298.0" />
-   </children>
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
+      prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="luca.ig_trading.Controller">
+    <children>
+        <TextArea fx:id="consoleTextArea" editable="false" layoutX="300.0" layoutY="1.0" prefHeight="498.0"
+                  prefWidth="599.0">
+            <font>
+                <Font size="9.0"/>
+            </font>
+        </TextArea>
+        <MenuBar layoutX="1.0" layoutY="1.0" prefWidth="298.0">
+            <menus>
+                <Menu mnemonicParsing="false" text="Connect">
+                    <items>
+                        <MenuItem fx:id="connect" mnemonicParsing="false" onAction="#onMenuConnectConnect"
+                                  text="Connect"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <TextArea fx:id="tickerListTextArea"
+                  editable="false"
+                  layoutX="1.0"
+                  layoutY="31.0"
+                  prefHeight="468.0"
+                  prefWidth="298.0">
+            <font>
+                <Font size="9.0"/>
+            </font>
+        </TextArea>
+    </children>
 </Pane>

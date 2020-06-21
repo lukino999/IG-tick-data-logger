@@ -7,6 +7,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import luca.ig_trading.Logger.MyLogger;
 import luca.ig_trading.streamer.Streamer;
+import luca.ig_trading.streamer.TickerUpdateListener;
 import luca.ig_trading.streamer.data.LoginDetails;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
@@ -18,6 +19,8 @@ public class Controller {
     private TextArea consoleTextArea;
     @FXML
     private MenuItem connect;
+    @FXML
+    private TextArea tickerListTextArea;
     private MyLogger logFileWriter;
     private LoginDetails loginDetails;
     private Streamer streamer = new Streamer();
@@ -53,6 +56,10 @@ public class Controller {
             @Override
             public void run() {
                 streamer.setLoginDetails(loginDetails);
+                TickerUpdateListener tickerUpdateListener = display -> {
+                    Platform.runLater(() -> tickerListTextArea.setText(display));
+                };
+                streamer.setTickerUpdateListener(tickerUpdateListener);
                 streamer.startLiveStream();
             }
         };

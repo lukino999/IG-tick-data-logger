@@ -47,7 +47,7 @@ public class MyLogger implements Writer {
         TimerTask flushFile = new TimerTask() {
             @Override
             public void run() {
-                System.out.println("log flush: " + LocalDateTime.now());
+                // System.out.println("log flush: " + LocalDateTime.now());
                 try {
                     flush();
                 } catch (Exception e) {

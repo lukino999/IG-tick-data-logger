@@ -17,13 +17,13 @@ import java.util.TimerTask;
 public class Streamer {
 
     private static final String[] fields = {"BID", "OFR", "UTM"};
-    private static final ArrayList<String> items = new ArrayList<>();
+//    private static final ArrayList<String> items = new ArrayList<>();
     private static String[] epics = {
-            "CS.D.GBPUSD.TODAY.IP",
-            "CS.D.EURGBP.TODAY.IP",
-            "CS.D.EURUSD.TODAY.IP",
-            "CS.D.USDJPY.TODAY.IP",
-            "IX.D.FTSE.DAILY.IP",
+//            "CS.D.GBPUSD.TODAY.IP",
+//            "CS.D.EURGBP.TODAY.IP",
+//            "CS.D.EURUSD.TODAY.IP",
+//            "CS.D.USDJPY.TODAY.IP",
+//            "IX.D.FTSE.DAILY.IP",
             "CS.D.BITCOIN.TODAY.IP",
             "CS.D.ETHUSD.TODAY.IP",
             "CS.D.CRYPTOB10.TODAY.IP",
@@ -43,6 +43,7 @@ public class Streamer {
     private Timer timer;
     private BufferedOutputStream stream;
     private final int BUFFER_SIZE = 1024;
+    private TickerUpdateListener tickerUpdateListener;
 
     public static void main(String[] args) {
         if (args.length != 3) {
@@ -66,6 +67,11 @@ public class Streamer {
 
     public void setBaseFileName(String baseFileName) {
         this.baseFileName = baseFileName;
+    }
+
+
+    public void setTickerUpdateListener(TickerUpdateListener tickerUpdateListener) {
+        this.tickerUpdateListener = tickerUpdateListener;
     }
 
 
@@ -106,6 +112,8 @@ public class Streamer {
 
             lsClient.addListener(new LogClientListener());
 
+
+            ArrayList<String> items = new ArrayList<>();
             for (String epic : epics) {
                 items.add("CHART:" + epic + ":TICK");
             }
@@ -115,13 +123,27 @@ public class Streamer {
             subscription = new Subscription("DISTINCT", itemsArray, fields);
             subscription.setRequestedSnapshot("yes");
 
-            com.lightstreamer.client.SubscriptionListener subListener = new LogSubscriptionListener(stream);
-            subscription.addListener(subListener);
+            subscription.addListener(new LogSubscriptionListener(stream, epics, tickerUpdateListener));
 
             lsClient.subscribe(subscription);
             lsClient.connect();
         }
     }
+
+
+    private LoginResponse login() {
+        try {
+            return httpClient.login(
+                    loginDetails.getUsername(),
+                    loginDetails.getPassword(),
+                    loginDetails.getApiKey()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     private void openFileStream() {
         File file = new File(baseFileName + ".csv");
@@ -136,11 +158,12 @@ public class Streamer {
         scheduleFileFlush();
     }
 
+
     private void scheduleFileFlush() {
         TimerTask flushFile = new TimerTask() {
             @Override
             public void run() {
-                System.out.println("csv flush: " + LocalDateTime.now());
+                // System.out.println("csv flush: " + LocalDateTime.now());
                 try {
                     synchronized (stream) {
                         stream.flush();
@@ -177,21 +200,6 @@ public class Streamer {
         if(timer != null) {
             timer.cancel();
         }
-    }
-
-
-    //
-    private LoginResponse login() {
-        try {
-            return httpClient.login(
-                    loginDetails.getUsername(),
-                    loginDetails.getPassword(),
-                    loginDetails.getApiKey()
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

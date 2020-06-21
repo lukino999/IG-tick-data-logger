@@ -4,17 +4,32 @@ package luca.ig_trading.streamer;
 import com.lightstreamer.client.ItemUpdate;
 import com.lightstreamer.client.Subscription;
 import com.lightstreamer.client.SubscriptionListener;
+import luca.ig_trading.streamer.data.Ticker;
 import org.pmw.tinylog.Logger;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 
 class LogSubscriptionListener implements SubscriptionListener {
 
     private BufferedOutputStream stream;
+    private ArrayList<Ticker> tickers = new ArrayList<>();
+    private TickerUpdateListener tickerUpdateListener;
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");
 
-    public LogSubscriptionListener(BufferedOutputStream stream) {
+    public LogSubscriptionListener(BufferedOutputStream stream, String[] epics, TickerUpdateListener tickerUpdateListener) {
         this.stream = stream;
+
+        for (String epic : epics) {
+            tickers.add(new Ticker(epic));
+        }
+
+        this.tickerUpdateListener = tickerUpdateListener;
     }
 
     @Override
@@ -50,21 +65,19 @@ class LogSubscriptionListener implements SubscriptionListener {
 
     @Override
     public void onItemUpdate(ItemUpdate update) {
-        String itemName = update.getItemName();
+        writeToFile(update);
+        updateDisplay(update);
+    }
 
-        System.out.println("onItemUpdate: " + itemName);
-
+    private void writeToFile(ItemUpdate update) {
         String bidString = update.getValue("BID");
         String ofrString = update.getValue("OFR");
         String utmString = update.getValue("UTM");
 
-        String record = itemName + "," + bidString + "," + ofrString + "," + utmString + "\n";
-
-        writeToFile(record);
-
-    }
-
-    private void writeToFile(String record) {
+        String record = update.getItemName() + ","
+                + bidString + ","
+                + ofrString + ","
+                + utmString + "\n";
         byte[] data = record.getBytes();
         synchronized (stream) {
             try {
@@ -74,6 +87,39 @@ class LogSubscriptionListener implements SubscriptionListener {
             }
         }
     }
+
+
+    SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM-dd HH:mm:ss.SSS");
+
+    private void updateDisplay(ItemUpdate update) {
+        StringBuilder display = new StringBuilder();
+        for (Ticker ticker : tickers) {
+            if (ticker.name.equals(update.getItemName().split(":")[1])) {
+                ticker.bid = Double.parseDouble(update.getValue("BID"));
+                ticker.ofr = Double.parseDouble(update.getValue("OFR"));
+                ticker.utm = Long.parseLong(update.getValue("UTM"));
+            }
+            display.append(ticker.name);
+            display.append("\t");
+
+            Date date = new java.util.Date(ticker.utm);
+            sdf.setTimeZone(java.util.TimeZone.getDefault());
+            String formattedDate = sdf.format(date);
+            display.append(formattedDate);
+
+            display.append("\n");
+            display.append(ticker.bid);
+            display.append("\t\t");
+            display.append(ticker.ofr);
+            display.append("\t\t");
+            double spread = Math.round((ticker.ofr - ticker.bid) * 10) * 0.1;
+            display.append(String.format("%.1f",spread));
+            display.append("\n\n");
+        }
+
+        tickerUpdateListener.onTickerUpdate(display.toString());
+    }
+
 
     @Override
     public void onListenEnd(Subscription subscription) {
