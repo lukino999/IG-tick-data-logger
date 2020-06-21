@@ -56,7 +56,6 @@ class LogSubscriptionListener implements SubscriptionListener {
     @Override
     public void onEndOfSnapshot(String arg0, int arg1) {
         Logger.info("Snapshot is now fully received, from now on only real-time messages will be received");
-        throwError();
     }
 
     @Override

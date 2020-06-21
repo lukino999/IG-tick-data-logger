@@ -15,13 +15,16 @@
  */
 package luca.ig_trading.streamer;
 
-import com.lightstreamer.client.ClientListener;
 import com.lightstreamer.client.LightstreamerClient;
+import luca.ig_trading.Logger.ClientErrorListener;
 import org.pmw.tinylog.Logger;
 
 public class LogClientListener implements com.lightstreamer.client.ClientListener {
 
-    public LogClientListener() {
+    private ClientErrorListener clientErrorListener;
+
+    public LogClientListener(ClientErrorListener clientErrorListener) {
+        this.clientErrorListener = clientErrorListener;
     }
 
     @Override
@@ -42,6 +45,8 @@ public class LogClientListener implements com.lightstreamer.client.ClientListene
     @Override
     public void onServerError(int code, String message) {
       Logger.info("Server error: " + code + ": " + message);
+      clientErrorListener.onError(code);
+
     }
 
     @Override

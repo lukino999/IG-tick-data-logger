@@ -3,6 +3,7 @@ package luca.ig_trading.streamer;
 import com.lightstreamer.client.LightstreamerClient;
 import com.lightstreamer.client.Subscription;
 import luca.ig_trading.Logger.Delay;
+import luca.ig_trading.Logger.ClientErrorListener;
 import luca.ig_trading.streamer.data.LoginDetails;
 import luca.ig_trading.streamer.data.LoginResponse;
 import org.pmw.tinylog.EnvironmentHelper;
@@ -44,6 +45,22 @@ public class Streamer {
     private BufferedOutputStream stream;
     private final int BUFFER_SIZE = 1024;
     private TickerUpdateListener tickerUpdateListener;
+    private ClientErrorListener clientErrorListener;
+
+    public Streamer() {
+        setupErrorListener();
+    }
+
+    private void setupErrorListener() {
+
+        this.clientErrorListener = code -> {
+            if (code == 1) {
+                // User/password check failed
+                startLiveStream();
+            }
+        };
+
+    }
 
     public static void main(String[] args) {
         if (args.length != 3) {
@@ -79,7 +96,9 @@ public class Streamer {
 
         Logger.info(" - Logging in");
 
-        httpClient = new HTTPClient();
+        if(httpClient == null) {
+            httpClient = new HTTPClient();
+        }
 
         LoginResponse loginResponse = login();
 
@@ -110,8 +129,7 @@ public class Streamer {
             }
             lsClient.connectionDetails.setPassword(password);
 
-            lsClient.addListener(new LogClientListener());
-
+            lsClient.addListener(new LogClientListener(clientErrorListener));
 
             ArrayList<String> items = new ArrayList<>();
             for (String epic : epics) {
@@ -121,8 +139,7 @@ public class Streamer {
             itemsArray = items.toArray(itemsArray);
 
             subscription = new Subscription("DISTINCT", itemsArray, fields);
-            subscription.setRequestedSnapshot("yes");
-
+//            subscription.setDataAdapter();//?
             subscription.addListener(new LogSubscriptionListener(stream, epics, tickerUpdateListener));
 
             lsClient.subscribe(subscription);
@@ -146,11 +163,16 @@ public class Streamer {
 
 
     private void openFileStream() {
+
+        if(stream != null) {
+            return;
+        }
+
         File file = new File(baseFileName + ".csv");
         EnvironmentHelper.makeDirectories(file);
 
         try {
-            stream = new BufferedOutputStream(new FileOutputStream(file, false), BUFFER_SIZE);
+            stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
