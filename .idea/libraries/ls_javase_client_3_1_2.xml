@@ -3,7 +3,9 @@
     <CLASSES>
       <root url="file://$PROJECT_DIR$/lib/ls-javase-client/3.1.2" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/ls-javase-client/3.1.2/ls-javase-client-3.1.2-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES />
     <jarDirectory url="file://$PROJECT_DIR$/lib/ls-javase-client/3.1.2" recursive="false" />
   </library>
