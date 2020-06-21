@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 
 class LogSubscriptionListener implements SubscriptionListener {
 
@@ -54,8 +55,8 @@ class LogSubscriptionListener implements SubscriptionListener {
     }
 
     @Override
-    public void onEndOfSnapshot(String arg0, int arg1) {
-        Logger.info("Snapshot is now fully received, from now on only real-time messages will be received");
+    public void onEndOfSnapshot(String itemName, int itemPos) {
+        Logger.info("onEndOfSnapshot for: " + itemName);
     }
 
     @Override
@@ -136,7 +137,6 @@ class LogSubscriptionListener implements SubscriptionListener {
     @Override
     public void onListenStart(Subscription subscription) {
         Logger.info("Start listening to subscription: " + subscription.toString());
-
     }
 
     @Override
