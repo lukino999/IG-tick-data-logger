@@ -2,54 +2,55 @@ package luca.ig_trading.streamer;
 
 import com.lightstreamer.client.LightstreamerClient;
 import com.lightstreamer.client.Subscription;
-import luca.ig_trading.Logger.Delay;
 import luca.ig_trading.Logger.ClientErrorListener;
+import luca.ig_trading.Logger.Delay;
 import luca.ig_trading.streamer.data.LoginDetails;
 import luca.ig_trading.streamer.data.LoginResponse;
+import org.jetbrains.annotations.Nullable;
 import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Streamer {
 
-    private static final String[] fields = {"BID", "OFR", "UTM"};
-//    private static final ArrayList<String> items = new ArrayList<>();
-    private static String[] epics = {
-            "CS.D.GBPUSD.TODAY.IP",
-            "CS.D.EURGBP.TODAY.IP",
-            "CS.D.EURUSD.TODAY.IP",
-            "CS.D.USDJPY.TODAY.IP",
-            "IX.D.FTSE.DAILY.IP"
-//            "CS.D.BITCOIN.TODAY.IP",
-//            "CS.D.ETHUSD.TODAY.IP",
-//            "CS.D.CRYPTOB10.TODAY.IP",
-//            "CS.D.EOSUSD.TODAY.IP",
-//            "CS.D.NEOUSD.TODAY.IP",
-//            "CS.D.BCHXBT.TODAY.IP",
-//            "CS.D.ETHXBT.TODAY.IP",
-//            "CS.D.BCHUSD.TODAY.IP",
-//            "CS.D.XRPUSD.TODAY.IP",
-//            "CS.D.LTCUSD.TODAY.IP"
-    };
-    private static LoginDetails loginDetails;
+    private LoginDetails loginDetails;
     private LightstreamerClient lsClient;
     private Subscription subscription;
     private HTTPClient httpClient;
     private String baseFileName;
     private Timer timer;
-    private BufferedOutputStream stream;
-    private final int BUFFER_SIZE = 1024;
+    private  BufferedOutputStream stream;
     private TickerUpdateListener tickerUpdateListener;
     private ClientErrorListener clientErrorListener;
+
+    private final String[] fields = {"BID", "OFR", "UTM"};
+    private String[] epics = {
+//            "CS.D.GBPUSD.TODAY.IP",
+//            "CS.D.EURGBP.TODAY.IP",
+//            "CS.D.EURUSD.TODAY.IP",
+//            "CS.D.USDJPY.TODAY.IP",
+//            "IX.D.FTSE.DAILY.IP"
+            "CS.D.BITCOIN.TODAY.IP",
+            "CS.D.ETHUSD.TODAY.IP",
+            "CS.D.CRYPTOB10.TODAY.IP",
+            "CS.D.EOSUSD.TODAY.IP",
+            "CS.D.NEOUSD.TODAY.IP",
+            "CS.D.BCHXBT.TODAY.IP",
+            "CS.D.ETHXBT.TODAY.IP",
+            "CS.D.BCHUSD.TODAY.IP",
+            "CS.D.XRPUSD.TODAY.IP",
+            "CS.D.LTCUSD.TODAY.IP"
+    };
+
 
     public Streamer() {
         setupErrorListener();
     }
+
 
     private void setupErrorListener() {
 
@@ -63,23 +64,9 @@ public class Streamer {
 
     }
 
-    public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.println("args required: username password apiKey");
-            return;
-        }
 
-        loginDetails.setUsername(args[0]);
-        loginDetails.setPassword(args[1]);
-        loginDetails.setApiKey(args[2]);
-
-        Streamer streamer = new Streamer();
-        streamer.startLiveStream();
-    }
-
-
-    public static void setLoginDetails(LoginDetails loginDetails) {
-        Streamer.loginDetails = loginDetails;
+    public void setLoginDetails(LoginDetails loginDetails) {
+        this.loginDetails = loginDetails;
     }
 
 
@@ -103,9 +90,7 @@ public class Streamer {
 
         LoginResponse loginResponse = login();
 
-        if (loginResponse == null) {
-            return;
-        } else {
+        if (loginResponse != null) {
 
             if(stream == null) {
                 openFileStream();
@@ -150,13 +135,10 @@ public class Streamer {
     }
 
 
+    @Nullable
     private LoginResponse login() {
         try {
-            return httpClient.login(
-                    loginDetails.getUsername(),
-                    loginDetails.getPassword(),
-                    loginDetails.getApiKey()
-            );
+            return httpClient.login(loginDetails);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -170,7 +152,7 @@ public class Streamer {
         EnvironmentHelper.makeDirectories(file);
 
         try {
-            stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
+            stream = new BufferedOutputStream(new FileOutputStream(file, true), 1024);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -195,7 +177,6 @@ public class Streamer {
             }
         };
         timer = new Timer();
-        LocalDateTime now = LocalDateTime.now();
 
         //
         timer.scheduleAtFixedRate(flushFile, Delay.getDelayToNextSecond() + 500, 1000);

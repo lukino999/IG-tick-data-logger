@@ -1,12 +1,10 @@
 package luca.ig_trading;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import luca.ig_trading.streamer.data.LoginDetails;
 import org.pmw.tinylog.Logger;
 
@@ -33,31 +31,34 @@ public class Main extends Application {
     }
 
 
+    public static String getBaseFileName() {
+        return baseFileName;
+    }
+
+
     private static void setLoginDetails(String[] args) {
         loginDetails.setUsername(args[0]);
         loginDetails.setPassword(args[1]);
         loginDetails.setApiKey(args[2]);
     }
 
-
+    public static LoginDetails getLoginDetails() {
+        return loginDetails;
+    }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("IG Data Logger");
         primaryStage.setScene(new Scene(root, 900, 500));
 
         Controller controller = loader.getController();
-        controller.setBaseFileName(baseFileName);
-        controller.setLoginDetails(loginDetails);
+//        controller.setBaseFileName(baseFileName);
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                controller.close();
-                primaryStage.close();
-            }
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            controller.close();
+            primaryStage.close();
         });
 
         primaryStage.show();

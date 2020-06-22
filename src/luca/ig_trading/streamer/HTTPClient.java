@@ -1,39 +1,38 @@
 package luca.ig_trading.streamer;
 
 import com.google.gson.Gson;
+import luca.ig_trading.streamer.data.LoginDetails;
+import luca.ig_trading.streamer.data.LoginResponse;
 import okhttp3.*;
 import org.json.simple.JSONObject;
-import luca.ig_trading.streamer.data.LoginResponse;
 import org.pmw.tinylog.Logger;
 
 import java.io.IOException;
 
 public class HTTPClient {
 
-    public HTTPClient() {
-    }
-
     // one instance, reuse
     private final OkHttpClient httpClient = new OkHttpClient();
 
 
-    public LoginResponse login(String username, String password, String APIKey) throws Exception {
+    public LoginResponse login(LoginDetails loginDetails) throws Exception {
 
         // form parameters
-
         JSONObject jsonBody = new JSONObject();
-        jsonBody.put("identifier", username);
-        jsonBody.put("password", password);
+        jsonBody.put("identifier", loginDetails.getUsername());
+        jsonBody.put("password", loginDetails.getPassword());
         // TODO: 2020-02-16 password should be encrypted
 
 
-        RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
+        RequestBody requestBody = RequestBody.create(
+                jsonBody.toString(),
+                MediaType.parse("application/json; charset=utf-8"));
 
         Request request = new Request.Builder()
                 .url("https://api.ig.com/gateway/deal/session")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("Accept:", "application/json; charset=UTF-8")
-                .addHeader("X-IG-API-KEY", APIKey)
+                .addHeader("X-IG-API-KEY", loginDetails.getApiKey())
                 .addHeader("Version", "2")
                 .post(requestBody)
                 .build();
