@@ -1,2 +1,6 @@
 /out/
 /data/
+.idea/vcs.xml
+.idea/artifacts/
+src/META-INF/
+src/luca/ig_trading/Test.java
