@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.lightstreamer</groupId>
+  <artifactId>ls-javase-client</artifactId>
+  <packaging>jar</packaging>
+  <version>3.1.2</version>
+  <name>Lightstreamer Java Client SDK</name>
+  <description>Lightstreamer Java Client SDK</description>
+  <url>http://www.lightstreamer.com</url>
+  <inceptionYear>2015</inceptionYear>
+  <organization>
+    <name>Lightstreamer Srl</name>
+    <url>http://www.lightstreamer.com</url>
+  </organization>
+  <issueManagement>
+    <system>Email</system>
+    <url>mailto:support@lightstreamer.com</url>
+  </issueManagement>
+  <licenses>
+    <license>
+      <name>Lightstreamer Software License Agreement</name>
+      <url>http://www.lightstreamer.com/lightstreamer-sla</url>
+      <distribution>repo</distribution>
+      <comments>Lightstreamer Software License Agreement</comments>
+    </license>
+    <license>
+      <name>Lightstreamer Software License Agreement</name>
+      <url>http://www.lightstreamer.com/lightstreamer-sla</url>
+      <distribution>manual</distribution>
+      <comments>Lightstreamer Software License Agreement</comments>
+    </license>
+  </licenses>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.lightstreamer</groupId>
+      <artifactId>ls-log-adapter-java</artifactId>
+      <version>1.0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+      <version>4.1.0.CR6</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+      <version>4.1.0.CR6</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler-proxy</artifactId>
+      <version>4.1.0.CR6</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
